@@ -1,0 +1,5 @@
+<bootloader>/usr/bin/pygrub</bootloader>
+<os>
+  <type arch='x86_64' machine='pc'>hvm</type>
+  <boot dev='hd'/>
+</os>

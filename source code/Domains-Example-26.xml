@@ -1,0 +1,16 @@
+ ...
+  <os>
+    <type>hvm</type>
+    <loader readonly='yes' type='rom'>
+        /usr/lib/xen/boot/hvmloader
+    </loader>
+    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>
+        /var/lib/libvirt/nvram/guest_VARS.fd
+    </nvram>
+    <boot dev='hd'/>
+    <boot dev='cdrom'/>
+    <bootmenu enable='yes' timeout='3000'/>
+    <smbios mode='sysinfo'/>
+    <bios useserial='yes' rebootTimeout='0'/>
+  </os>
+  ...

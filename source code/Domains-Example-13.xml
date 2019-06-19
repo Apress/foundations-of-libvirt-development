@@ -1,0 +1,5 @@
+<os>
+  <type arch='x86_64' machine='pc'>hvm</type>
+  <boot dev='hd'/>
+  <boot dev='network'/>
+</os>

@@ -1,0 +1,4 @@
+<bootloader>/usr/bin/pygrub</bootloader>
+<os>
+  <type arch='x86_64' machine='pc'>xen</type>
+</os>

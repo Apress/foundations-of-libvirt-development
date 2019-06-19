@@ -1,0 +1,7 @@
+<interface type='ethernet' name='eth0'>
+  <start mode='onboot'/>
+  <mac address='aa:bb:cc:dd:ee:ff'/>
+  <protocol family='ipv4'>
+    <dhcp/>
+  </protocol>
+</interface>

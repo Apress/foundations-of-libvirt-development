@@ -1,0 +1,4 @@
+<disk type='file' device='cdrom'>
+  <source file='/var/lib/libvirt/images/rhel5-x86_64-dvd.iso'/>
+  <target dev='hdc' bus='ide'/>
+</disk>

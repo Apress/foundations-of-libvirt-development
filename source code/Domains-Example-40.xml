@@ -1,0 +1,6 @@
+<domain type='kvm'>
+    ...
+    <input type='tablet' bus='usb'/>
+    <input type='mouse' bus='ps2'/>
+    ...
+</domain>

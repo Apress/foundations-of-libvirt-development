@@ -1,0 +1,7 @@
+<domain>
+  ...
+  <maxMemory slots='16' unit='KiB'>1524288</maxMemory>
+  <memory unit='KiB'>524288</memory>
+  <currentMemory unit='KiB'>524288</currentMemory>
+  ...
+</domain>

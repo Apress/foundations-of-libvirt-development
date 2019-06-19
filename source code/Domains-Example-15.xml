@@ -1,0 +1,6 @@
+<os>
+  <type arch='x86_64' machine='pc'>hvm</type>
+  <kernel>/var/lib/libvirt/boot/f11-x86_64-vmlinuz</kernel>
+  <initrd>/var/lib/libvirt/boot/f11-x86_64-initrd.img</initrd>
+  <cmdline>method=http://download.fedoraproject.org/pub/fedora/linux/releases/11/x86_64/os console=ttyS0 console=tty</cmdline>
+</os>

@@ -1,0 +1,1497 @@
+<!--General metadata -->
+
+<domain type='kvm' id='1'>
+  <name>MyGuest</name>
+  <uuid>4dea22b3-1d52-d8f3-2516-782e98ab3fa0</uuid>
+  <genid>43dc0cf8-809b-4adb-9bea-a9abb5f3d90e</genid>
+  <title>A short description - title - of the domain</title>
+  <description>Some human readable description</description>
+  <metadata>
+    <app1:foo xmlns:app1="http://app1.org/app1/">..</app1:foo>
+    <app2:bar xmlns:app2="http://app1.org/app2/">..</app2:bar>
+  </metadata>
+  <bootloader>/usr/bin/pygrub</bootloader>
+  <bootloader_args>--append single</bootloader_args>
+
+  <!-- BIOS bootloader -->
+
+  <os>
+    <type>hvm</type>
+    <loader readonly='yes' secure='no' type='rom'>
+        /usr/lib/xen/boot/hvmloader</loader>
+    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>
+        /var/lib/libvirt/nvram/guest_VARS.fd</nvram>
+    <boot dev='hd'/>
+    <boot dev='cdrom'/>
+    <bootmenu enable='yes' timeout='3000'/>
+    <smbios mode='sysinfo'/>
+    <bios useserial='yes' rebootTimeout='0'/>
+  </os>
+
+  <!-- Host bootloader -->
+
+  <bootloader>/usr/bin/pygrub</bootloader>
+  <bootloader_args>--append single</bootloader_args>
+
+  <!-- Direct kernel boot -->
+
+  <os>
+    <type>hvm</type>
+    <loader>/usr/lib/xen/boot/hvmloader</loader>
+    <kernel>/root/f8-i386-vmlinuz</kernel>
+    <initrd>/root/f8-i386-initrd</initrd>
+    <cmdline>console=ttyS0 ks=http://example.com/f8-i386/os/</cmdline>
+    <dtb>/root/ppc.dtb</dtb>
+    <acpi>
+      <table type='slic'>/path/to/slic.dat</table>
+    </acpi>
+  </os>
+
+  <!-- Container boot -->
+
+  <os>
+    <type arch='x86_64'>exe</type>
+    <init>/bin/systemd</init>
+    <initarg>--unit</initarg>
+    <initarg>emergency.service</initarg>
+    <initenv name='MYENV'>some value</initenv>
+    <initdir>/my/custom/cwd</initdir>
+    <inituser>tester</inituser>
+    <initgroup>1000</initgroup>
+  </os>
+  <idmap>
+    <uid start='0' target='1000' count='10'/>
+    <gid start='0' target='1000' count='10'/>
+  </idmap>
+
+  <!-- SMBIOS System Information -->
+
+  <os>
+  <smbios mode='sysinfo'/>
+  </os>
+  <sysinfo type='smbios'>
+    <bios>
+      <entry name='vendor'>LENOVO</entry>
+    </bios>
+    <system>
+      <entry name='manufacturer'>Fedora</entry>
+      <entry name='product'>Virt-Manager</entry>
+      <entry name='version'>0.9.4</entry>
+    </system>
+    <baseBoard>
+      <entry name='manufacturer'>LENOVO</entry>
+      <entry name='product'>20BE0061MC</entry>
+      <entry name='version'>0B98401 Pro</entry>
+      <entry name='serial'>W1KS427111E</entry>
+    </baseBoard>
+    <chassis>
+      <entry name='manufacturer'>Dell Inc.</entry>
+      <entry name='version'>2.12</entry>
+      <entry name='serial'>65X0XF2</entry>
+      <entry name='asset'>40000101</entry>
+      <entry name='sku'>Type3Sku1</entry>
+    </chassis>
+    <oemStrings>
+      <entry>myappname:some arbitrary data</entry>
+      <entry>otherappname:more arbitrary data</entry>
+    </oemStrings>
+  </sysinfo>
+
+  <!-- CPU Allocation -->
+
+  <vcpu placement='static' cpuset="1-4,^3,6" current="1">2</vcpu>
+  <vcpus>
+    <vcpu id='0' enabled='yes' hotpluggable='no' order='1'/>
+    <vcpu id='1' enabled='no' hotpluggable='yes'/>
+  </vcpus>
+
+  <!-- IOThreads Allocation -->
+
+  <iothreads>4</iothreads>
+  <iothreadids>
+    <iothread id="2"/>
+    <iothread id="4"/>
+    <iothread id="6"/>
+    <iothread id="8"/>
+  </iothreadids>
+
+ <!-- CPU Tuning -->
+
+  <cputune>
+    <vcpupin vcpu="0" cpuset="1-4,^2"/>
+    <vcpupin vcpu="1" cpuset="0,1"/>
+    <vcpupin vcpu="2" cpuset="2,3"/>
+    <vcpupin vcpu="3" cpuset="0,4"/>
+    <emulatorpin cpuset="1-3"/>
+    <iothreadpin iothread="1" cpuset="5,6"/>
+    <iothreadpin iothread="2" cpuset="7,8"/>
+    <shares>2048</shares>
+    <period>1000000</period>
+    <quota>-1</quota>
+    <global_period>1000000</global_period>
+    <global_quota>-1</global_quota>
+    <emulator_period>1000000</emulator_period>
+    <emulator_quota>-1</emulator_quota>
+    <iothread_period>1000000</iothread_period>
+    <iothread_quota>-1</iothread_quota>
+    <vcpusched vcpus='0-4,^3' scheduler='fifo' priority='1'/>
+    <iothreadsched iothreads='2' scheduler='batch'/>
+    <cachetune vcpus='0-3'>
+      <cache id='0' level='3' type='both' size='3' unit='MiB'/>
+      <cache id='1' level='3' type='both' size='3' unit='MiB'/>
+      <monitor level='3' vcpus='1'/>
+      <monitor level='3' vcpus='0-3'/>
+    </cachetune>
+    <cachetune vcpus='4-5'>
+      <monitor level='3' vcpus='4'/>
+      <monitor level='3' vcpus='5'/>
+    </cachetune>
+    <memorytune vcpus='0-3'>
+      <node id='0' bandwidth='60'/>
+    </memorytune>
+  </cputune>
+
+  <!-- Memory Allocation -->
+
+  <maxMemory slots='16' unit='KiB'>1524288</maxMemory>
+  <memory unit='KiB'>524288</memory>
+  <currentMemory unit='KiB'>524288</currentMemory>
+
+  <!-- Memory Backing -->
+
+  <memoryBacking>
+    <hugepages>
+      <page size="1" unit="G" nodeset="0-3,5"/>
+      <page size="2" unit="M" nodeset="4"/>
+    </hugepages>
+    <nosharepages/>
+    <source type="file|anonymous|memfd"/>
+    <access mode="shared|private"/>
+    <allocation mode="immediate|ondemand"/>
+  </memoryBacking>
+
+  <!-- Memory Tuning -->
+  
+  <memtune>
+    <hard_limit unit='G'>1</hard_limit>
+    <soft_limit unit='M'>128</soft_limit>
+    <swap_hard_limit unit='G'>2</swap_hard_limit>
+    <min_guarantee unit='bytes'>67108864</min_guarantee>
+  </memtune>
+
+  <!-- NUMA Node Tuning -->
+  
+  <numatune>
+    <memory mode="strict" nodeset="1-4,^3"/>
+    <memnode cellid="0" mode="strict" nodeset="1"/>
+    <memnode cellid="2" mode="preferred" nodeset="2"/>
+  </numatune>
+
+  <!-- Block I/O Tuning -->
+  
+  <blkiotune>
+    <weight>800</weight>
+    <device>
+      <path>/dev/sda</path>
+      <weight>1000</weight>
+    </device>
+    <device>
+      <path>/dev/sdb</path>
+      <weight>500</weight>
+      <read_bytes_sec>10000</read_bytes_sec>
+      <write_bytes_sec>10000</write_bytes_sec>
+      <read_iops_sec>20000</read_iops_sec>
+      <write_iops_sec>20000</write_iops_sec>
+    </device>
+  </blkiotune>
+
+  <!-- Resource partitioning -->
+  
+  <resource>
+    <partition>/virtualmachines/production</partition>
+  </resource>
+
+  <!-- CPU model and topology -->
+  
+  <cpu match='exact'>
+    <model fallback='allow'>core2duo</model>
+    <vendor>Intel</vendor>
+    <topology sockets='1' cores='2' threads='1'/>
+    <cache level='3' mode='emulate'/>
+    <feature policy='disable' name='lahf_lm'/>
+  </cpu>
+  <cpu mode='host-model'>
+    <model fallback='forbid'/>
+    <topology sockets='1' cores='2' threads='1'/>
+  </cpu>
+  <cpu mode='host-passthrough'>
+    <cache mode='passthrough'/>
+    <feature policy='disable' name='lahf_lm'/>
+  </cpu>
+  <cpu>
+    <topology sockets='1' cores='2' threads='1'/>
+  </cpu>
+  <cpu>
+    <numa>
+      <cell id='0' cpus='0-3' memory='512000' unit='KiB' discard='yes'/>
+      <cell id='1' cpus='4-7' memory='512000' unit='KiB' memAccess='shared'/>
+    </numa>
+    <numa>
+      <cell id='0' cpus='0,4-7' memory='512000' unit='KiB'>
+        <distances>
+          <sibling id='0' value='10'/>
+          <sibling id='1' value='21'/>
+          <sibling id='2' value='31'/>
+          <sibling id='3' value='41'/>
+        </distances>
+      </cell>
+      <cell id='1' cpus='1,8-10,12-15' memory='512000' unit='KiB' 
+          memAccess='shared'>
+        <distances>
+          <sibling id='0' value='21'/>
+          <sibling id='1' value='10'/>
+          <sibling id='2' value='21'/>
+          <sibling id='3' value='31'/>
+        </distances>
+      </cell>
+      <cell id='2' cpus='2,11' memory='512000' unit='KiB' memAccess='shared'>
+        <distances>
+          <sibling id='0' value='31'/>
+          <sibling id='1' value='21'/>
+          <sibling id='2' value='10'/>
+          <sibling id='3' value='21'/>
+        </distances>
+      </cell>
+      <cell id='3' cpus='3' memory='512000' unit='KiB'>
+        <distances>
+          <sibling id='0' value='41'/>
+          <sibling id='1' value='31'/>
+          <sibling id='2' value='21'/>
+          <sibling id='3' value='10'/>
+        </distances>
+      </cell>
+    </numa>
+  </cpu>
+
+  <!-- Events configuration -->
+  
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <on_lockfailure>poweroff</on_lockfailure>
+
+  <!-- Power Management -->
+  
+  <pm>
+    <suspend-to-disk enabled='no'/>
+    <suspend-to-mem enabled='yes'/>
+  </pm>
+
+  <!-- Hypervisor features -->
+  
+  <features>
+    <pae/>
+    <acpi/>
+    <apic/>
+    <hap/>
+    <privnet/>
+    <hyperv>
+      <relaxed state='on'/>
+      <vapic state='on'/>
+      <spinlocks state='on' retries='4096'/>
+      <vpindex state='on'/>
+      <runtime state='on'/>
+      <synic state='on'/>
+      <reset state='on'/>
+      <vendor_id state='on' value='KVM Hv'/>
+      <frequencies state='on'/>
+      <reenlightenment state='on'/>
+      <tlbflush state='on'/>
+      <ipi state='on'/>
+      <evmcs state='on'/>
+    </hyperv>
+    <kvm>
+      <hidden state='on'/>
+    </kvm>
+    <pvspinlock state='on'/>
+    <gic version='2'/>
+    <ioapic driver='qemu'/>
+    <hpt resizing='required'>
+      <maxpagesize unit='MiB'>16</maxpagesize>
+    </hpt>
+    <vmcoreinfo state='on'/>
+    <smm state='on'>
+      <tseg unit='MiB'>48</tseg>
+    </smm>
+    <htm state='on'/>
+  </features>
+
+  <!-- Time keeping -->
+  
+  <clock offset='localtime'>
+    <timer name='rtc' tickpolicy='catchup' track='guest'>
+      <catchup threshold='123' slew='120' limit='10000'/>
+    </timer>
+    <timer name='pit' tickpolicy='delay'/>
+  </clock>
+
+  <!-- Performance monitoring events -->
+  
+  <perf>
+    <event name='cmt' enabled='yes'/>
+    <event name='mbmt' enabled='no'/>
+    <event name='mbml' enabled='yes'/>
+    <event name='cpu_cycles' enabled='no'/>
+    <event name='instructions' enabled='yes'/>
+    <event name='cache_references' enabled='no'/>
+    <event name='cache_misses' enabled='no'/>
+    <event name='branch_instructions' enabled='no'/>
+    <event name='branch_misses' enabled='no'/>
+    <event name='bus_cycles' enabled='no'/>
+    <event name='stalled_cycles_frontend' enabled='no'/>
+    <event name='stalled_cycles_backend' enabled='no'/>
+    <event name='ref_cpu_cycles' enabled='no'/>
+    <event name='cpu_clock' enabled='no'/>
+    <event name='task_clock' enabled='no'/>
+    <event name='page_faults' enabled='no'/>
+    <event name='context_switches' enabled='no'/>
+    <event name='cpu_migrations' enabled='no'/>
+    <event name='page_faults_min' enabled='no'/>
+    <event name='page_faults_maj' enabled='no'/>
+    <event name='alignment_faults' enabled='no'/>
+    <event name='emulation_faults' enabled='no'/>
+  </perf>
+
+  <!-- Devices -->
+  
+  <devices>
+    <emulator>/usr/lib/xen/bin/qemu-dm</emulator>
+  </devices>
+  <devices>
+    <disk type='file'>
+      <alias name='ua-myDisk'/>
+    </disk>
+    <interface type='network' trustGuestRxFilters='yes'>
+      <alias name='ua-myNIC'/>
+    </interface>
+    ...
+  </devices>
+
+  <!-- Hard drives, floppy disks, CDROMs -->
+  
+  <devices>
+    <disk type='file' snapshot='external'>
+      <driver name="tap" type="aio" cache="default"/>
+      <source file='/var/lib/xen/images/fv0' startupPolicy='optional'>
+        <seclabel relabel='no'/>
+      </source>
+      <target dev='hda' bus='ide'/>
+      <iotune>
+        <total_bytes_sec>10000000</total_bytes_sec>
+        <read_iops_sec>400000</read_iops_sec>
+        <write_iops_sec>100000</write_iops_sec>
+      </iotune>
+      <boot order='2'/>
+      <encryption type='...'>
+        ...
+      </encryption>
+      <shareable/>
+      <serial>
+        ...
+      </serial>
+    </disk>
+    <disk type='network'>
+      <driver name="qemu" type="raw" io="threads" ioeventfd="on" 
+          event_idx="off"/>
+      <source protocol="sheepdog" name="image_name">
+        <host name="hostname" port="7000"/>
+      </source>
+      <target dev="hdb" bus="ide"/>
+      <boot order='1'/>
+      <transient/>
+      <address type='drive' controller='0' bus='1' unit='0'/>
+    </disk>
+    <disk type='network'>
+      <driver name="qemu" type="raw"/>
+      <source protocol="rbd" name="image_name2">
+        <host name="hostname" port="7000"/>
+        <snapshot name="snapname"/>
+        <config file="/path/to/file"/>
+        <auth username='myuser'>
+          <secret type='ceph' usage='mypassid'/>
+        </auth>
+      </source>
+      <target dev="hdc" bus="ide"/>
+    </disk>
+    <disk type='block' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <target dev='hdd' bus='ide' tray='open'/>
+      <readonly/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="http" name="url_path">
+        <host name="hostname" port="80"/>
+      </source>
+      <target dev='hde' bus='ide' tray='open'/>
+      <readonly/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="https" name="url_path">
+        <host name="hostname" port="443"/>
+      </source>
+      <target dev='hdf' bus='ide' tray='open'/>
+      <readonly/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="ftp" name="url_path">
+        <host name="hostname" port="21"/>
+      </source>
+      <target dev='hdg' bus='ide' tray='open'/>
+      <readonly/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="ftps" name="url_path">
+        <host name="hostname" port="990"/>
+      </source>
+      <target dev='hdh' bus='ide' tray='open'/>
+      <readonly/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="tftp" name="url_path">
+        <host name="hostname" port="69"/>
+      </source>
+      <target dev='hdi' bus='ide' tray='open'/>
+      <readonly/>
+    </disk>
+    <disk type='block' device='lun'>
+      <driver name='qemu' type='raw'/>
+      <source dev='/dev/sda'>
+        <reservations managed='no'>
+          <source type='unix' path='/path/to/qemu-pr-helper' mode='client'/>
+        </reservations>
+      <target dev='sda' bus='scsi'/>
+      <address type='drive' controller='0' bus='0' target='3' unit='0'/>
+    </disk>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source dev='/dev/sda'/>
+      <geometry cyls='16383' heads='16' secs='63' trans='lba'/>
+      <blockio logical_block_size='512' physical_block_size='4096'/>
+      <target dev='hdj' bus='ide'/>
+    </disk>
+    <disk type='volume' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source pool='blk-pool0' volume='blk-pool0-vol0'/>
+      <target dev='hdk' bus='ide'/>
+    </disk>
+    <disk type='network' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source protocol='iscsi' name='iqn.2013-07.com.example:iscsi-nopool/2'>
+        <host name='example.com' port='3260'/>
+        <auth username='myuser'>
+          <secret type='iscsi' usage='libvirtiscsi'/>
+        </auth>
+      </source>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <disk type='network' device='lun'>
+      <driver name='qemu' type='raw'/>
+      <source protocol='iscsi' name='iqn.2013-07.com.example:iscsi-nopool/1'>
+        <host name='example.com' port='3260'/>
+        <auth username='myuser'>
+          <secret type='iscsi' usage='libvirtiscsi'/>
+        </auth>
+      </source>
+      <target dev='sdb' bus='scsi'/>
+    </disk>
+    <disk type='network' device='lun'>
+      <driver name='qemu' type='raw'/>
+      <source protocol='iscsi' name='iqn.2013-07.com.example:iscsi-nopool/0'>
+        <host name='example.com' port='3260'/>
+        <initiator>
+          <iqn name='iqn.2013-07.com.example:client'/>
+        </initiator>
+      </source>
+      <target dev='sdb' bus='scsi'/>
+    </disk>
+    <disk type='volume' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source pool='iscsi-pool' volume='unit:0:0:1' mode='host'/>
+      <target dev='vdb' bus='virtio'/>
+    </disk>
+    <disk type='volume' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source pool='iscsi-pool' volume='unit:0:0:2' mode='direct'/>
+      <target dev='vdc' bus='virtio'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' queues='4'/>
+      <source file='/var/lib/libvirt/images/domain.qcow'/>
+      <backingStore type='file'>
+        <format type='qcow2'/>
+        <source file='/var/lib/libvirt/images/snapshot.qcow'/>
+        <backingStore type='block'>
+          <format type='raw'/>
+          <source dev='/dev/mapper/base'/>
+          <backingStore/>
+        </backingStore>
+      </backingStore>
+      <target dev='vdd' bus='virtio'/>
+    </disk>
+  </devices>
+
+  <!-- Filesystems -->
+  
+  <devices>
+    <filesystem type='template'>
+      <source name='my-vm-template'/>
+      <target dir='/'/>
+    </filesystem>
+    <filesystem type='mount' accessmode='passthrough'>
+      <driver type='path' wrpolicy='immediate'/>
+      <source dir='/export/to/guest'/>
+      <target dir='/import/from/host'/>
+      <readonly/>
+    </filesystem>
+    <filesystem type='file' accessmode='passthrough'>
+      <driver name='loop' type='raw'/>
+      <driver type='path' wrpolicy='immediate'/>
+      <source file='/export/to/guest.img'/>
+      <target dir='/import/from/host'/>
+      <readonly/>
+    </filesystem>
+  </devices>
+
+  <!-- Controllers -->
+  
+  <devices>
+    <controller type='ide' index='0'/>
+    <controller type='virtio-serial' index='0' ports='16' vectors='4'/>
+    <controller type='virtio-serial' index='1'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x0a' 
+          function='0x0'/>
+    </controller>
+    <controller type='scsi' index='0' model='virtio-scsi'>
+      <driver iothread='4'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x0b' 
+          function='0x0'/>
+    </controller>
+  </devices>
+  <devices>
+    <controller type='usb' index='0' model='ich9-ehci1'>
+      <address type='pci' domain='0' bus='0' slot='4' function='7'/>
+    </controller>
+    <controller type='usb' index='0' model='ich9-uhci1'>
+      <master startport='0'/>
+      <address type='pci' domain='0' bus='0' slot='4' function='0' 
+          multifunction='on'/>
+    </controller>
+  </devices>
+  <devices>
+    <controller type='pci' index='0' model='pci-root'/>
+    <controller type='pci' index='1' model='pci-bridge'>
+      <address type='pci' domain='0' bus='0' slot='5' function='0' 
+          multifunction='off'/>
+    </controller>
+  </devices>
+  <devices>
+    <controller type='pci' index='0' model='pcie-root'/>
+    <controller type='pci' index='1' model='dmi-to-pci-bridge'>
+      <address type='pci' domain='0' bus='0' slot='0xe' function='0'/>
+    </controller>
+    <controller type='pci' index='2' model='pci-bridge'>
+      <address type='pci' domain='0' bus='1' slot='1' function='0'/>
+    </controller>
+  </devices>
+
+  <!-- Device leases -->
+
+  <devices>
+    ...
+    <lease>
+      <lockspace>somearea</lockspace>
+      <key>somekey</key>
+      <target path='/some/lease/path' offset='1024'/>
+    </lease>
+    ...
+  </devices>
+
+  <!-- USB / PCI / SCSI devices -->
+  
+  <devices>
+    <hostdev mode='subsystem' type='usb'>
+      <source startupPolicy='optional'>
+        <vendor id='0x1234'/>
+        <product id='0xbeef'/>
+      </source>
+      <boot order='2'/>
+    </hostdev>
+  </devices>
+  <devices>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x06' slot='0x02' function='0x0'/>
+      </source>
+      <boot order='1'/>
+      <rom bar='on' file='/etc/fake/boot.bin'/>
+    </hostdev>
+  </devices>
+  <devices>
+    <hostdev mode='subsystem' type='scsi' sgio='filtered' rawio='yes'>
+      <source>
+        <adapter name='scsi_host0'/>
+        <address bus='0' target='0' unit='0'/>
+      </source>
+      <readonly/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </hostdev>
+  </devices>
+  <devices>
+    <hostdev mode='subsystem' type='scsi'>
+      <source protocol='iscsi' name='iqn.2014-08.com.example:iscsi-nopool/1'>
+        <host name='example.com' port='3260'/>
+        <auth username='myuser'>
+          <secret type='iscsi' usage='libvirtiscsi'/>
+        </auth>
+      </source>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </hostdev>
+  </devices>
+  <devices>
+    <hostdev mode='subsystem' type='scsi_host'>
+      <source protocol='vhost' wwpn='naa.50014057667280d8'/>
+    </hostdev>
+  </devices>
+  <devices>
+    <hostdev mode='subsystem' type='mdev' model='vfio-pci'>
+    <source>
+      <address uuid='c2177883-f1bb-47f0-914d-32a22e3a8804'/>
+    </source>
+    </hostdev>
+    <hostdev mode='subsystem' type='mdev' model='vfio-ccw'>
+    <source>
+      <address uuid='9063cba3-ecef-47b6-abcf-3fef4fdcad85'/>
+    </source>
+    <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0001'/>
+    </hostdev>
+  </devices>
+
+  <!-- Block / character devices -->
+  
+  <hostdev mode='capabilities' type='storage'>
+    <source>
+      <block>/dev/sdf1</block>
+    </source>
+  </hostdev>
+  <hostdev mode='capabilities' type='misc'>
+    <source>
+      <char>/dev/input/event3</char>
+    </source>
+  </hostdev>
+  <hostdev mode='capabilities' type='net'>
+    <source>
+      <interface>eth0</interface>
+    </source>
+  </hostdev>
+
+  <!-- Redirected devices -->
+  
+  <devices>
+    <redirdev bus='usb' type='tcp'>
+      <source mode='connect' host='localhost' service='4000'/>
+      <boot order='1'/>
+    </redirdev>
+    <redirfilter>
+      <usbdev class='0x08' vendor='0x1234' product='0xbeef' version='2.56' 
+          allow='yes'/>
+      <usbdev allow='no'/>
+    </redirfilter>
+  </devices>
+
+  <!-- Smartcard devices -->
+  
+  <devices>
+    <smartcard mode='host'/>
+    <smartcard mode='host-certificates'>
+      <certificate>cert1</certificate>
+      <certificate>cert2</certificate>
+      <certificate>cert3</certificate>
+      <database>/etc/pki/nssdb/</database>
+    </smartcard>
+    <smartcard mode='passthrough' type='tcp'>
+      <source mode='bind' host='127.0.0.1' service='2001'/>
+      <protocol type='raw'/>
+      <address type='ccid' controller='0' slot='0'/>
+    </smartcard>
+    <smartcard mode='passthrough' type='spicevmc'/>
+  </devices>
+  <devices>
+    <interface type='direct' trustGuestRxFilters='yes'>
+      <source dev='eth0'/>
+      <mac address='52:54:00:5d:c7:9e'/>
+      <boot order='1'/>
+      <rom bar='off'/>
+    </interface>
+  </devices>
+
+  <!-- Network interfaces -->
+  
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+    </interface>
+    ...
+    <interface type='network'>
+      <source network='default' portgroup='engineering'/>
+      <target dev='vnet7'/>
+      <mac address="00:11:22:33:44:55"/>
+      <virtualport>
+        <parameters instanceid='09b11c53-8b5c-4eeb-8f00-d84eaa0aaa4f'/>
+      </virtualport>
+    </interface>
+  </devices>
+
+  <!-- Bridge to LAN -->
+  
+  <devices>
+    ...
+    <interface type='bridge'>
+      <source bridge='br0'/>
+    </interface>
+    <interface type='bridge'>
+      <source bridge='br1'/>
+      <target dev='vnet7'/>
+      <mac address="00:11:22:33:44:55"/>
+    </interface>
+    <interface type='bridge'>
+      <source bridge='ovsbr'/>
+      <virtualport type='openvswitch'>
+        <parameters profileid='menial' 
+            interfaceid='09b11c53-8b5c-4eeb-8f00-d84eaa0aaa4f'/>
+      </virtualport>
+    </interface>
+    ...
+  </devices>
+  <devices>
+    ...
+    <interface type='bridge'>
+      <source bridge='br0'/>
+    </interface>
+    <interface type='bridge'>
+      <source bridge='br1'/>
+      <target dev='vnet7'/>
+      <mac address="00:11:22:33:44:55"/>
+    </interface>
+    <interface type='bridge'>
+      <source bridge='midonet'/>
+      <virtualport type='midonet'>
+        <parameters interfaceid='0b2d64da-3d0e-431e-afdd-804415d6ebbb'/>
+      </virtualport>
+    </interface>
+    ...
+  </devices>
+
+  <!-- Userspace SLIRP stack -->
+  
+  <devices>
+    <interface type='user'/>
+    ...
+    <interface type='user'>
+      <mac address="00:11:22:33:44:55"/>
+      <ip family='ipv4' address='172.17.2.0' prefix='24'/>
+      <ip family='ipv6' address='2001:db8:ac10:fd01::' prefix='64'/>
+    </interface>
+  </devices>
+
+  <!-- Generic ethernet connection -->
+  
+  <devices>
+    <interface type='ethernet'/>
+    ...
+    <interface type='ethernet'>
+      <target dev='vnet7'/>
+      <script path='/etc/qemu-ifup-mynet'/>
+    </interface>
+  </devices>
+  <devices>
+    ...
+    <interface type='direct' trustGuestRxFilters='no'>
+      <source dev='eth0' mode='vepa'/>
+    </interface>
+  </devices>
+  <devices>
+    ...
+    <interface type='direct'>
+      <source dev='eth0.2' mode='vepa'/>
+      <virtualport type="802.1Qbg">
+        <parameters managerid="11" typeid="1193047" typeidversion="2" 
+            instanceid="09b11c53-8b5c-4eeb-8f00-d84eaa0aaa4f"/>
+      </virtualport>
+    </interface>
+  </devices>
+  <devices>
+    ...
+    <interface type='direct'>
+      <source dev='eth0' mode='private'/>
+      <virtualport type='802.1Qbh'>
+        <parameters profileid='finance'/>
+      </virtualport>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='hostdev' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address type='pci' domain='0x0000' bus='0x00' slot='0x07' 
+            function='0x0'/>
+      </source>
+      <mac address='52:54:00:6d:90:02'/>
+      <virtualport type='802.1Qbh'>
+        <parameters profileid='finance'/>
+      </virtualport>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='mcast'>
+      <mac address='52:54:00:6d:90:01'/>
+      <source address='230.0.0.1' port='5558'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='server'>
+      <mac address='52:54:00:22:c9:42'/>
+      <source address='192.168.0.1' port='5558'/>
+    </interface>
+    ...
+    <interface type='client'>
+      <mac address='52:54:00:8b:c9:51'/>
+      <source address='192.168.0.1' port='5558'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='udp'>
+      <mac address='52:54:00:22:c9:42'/>
+      <source address='127.0.0.1' port='11115'>
+        <local address='127.0.0.1' port='11116'/>
+      </source>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet1'/>
+      <model type='ne2k_pci'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet1'/>
+      <model type='virtio'/>
+      <driver name='vhost' txmode='iothread' ioeventfd='on' event_idx='off' 
+          queues='5' rx_queue_size='256' tx_queue_size='256'>
+        <host csum='off' gso='off' tso4='off' tso6='off' ecn='off' ufo='off' 
+            mrg_rxbuf='off'/>
+        <guest csum='off' tso4='off' tso6='off' ecn='off' ufo='off'/>
+      </driver>
+      </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet1'/>
+      <model type='virtio'/>
+      <backend tap='/dev/net/tun' vhost='/dev/vhost-net'/>
+      <driver name='vhost' txmode='iothread' ioeventfd='on' event_idx='off' 
+          queues='5'/>
+      <tune>
+        <sndbuf>1600</sndbuf>
+      </tune>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet1'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <guest dev='myeth'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet1'/>
+      <boot order='1'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet1'/>
+      <rom bar='on' file='/etc/fake/boot.bin'/>
+    </interface>
+  </devices>
+  <devices>
+    ...
+    <interface type='bridge'>
+      <source bridge='br0'/>
+      <backenddomain name='netvm'/>
+    </interface>
+    ...
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet0'/>
+      <bandwidth>
+        <inbound average='1000' peak='5000' floor='200' burst='1024'/>
+        <outbound average='128' peak='256' burst='256'/>
+      </bandwidth>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='bridge'>
+      <vlan>
+        <tag id='42'/>
+      </vlan>
+      <source bridge='ovsbr0'/>
+      <virtualport type='openvswitch'>
+        <parameters interfaceid='09b11c53-8b5c-4eeb-8f00-d84eaa0aaa4f'/>
+      </virtualport>
+    </interface>
+    <interface type='bridge'>
+      <vlan trunk='yes'>
+        <tag id='42'/>
+        <tag id='123' nativeMode='untagged'/>
+      </vlan>
+      ...
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet0'/>
+      <link state='down'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet0'/>
+      <mtu size='1500'/>
+    </interface>
+  </devices>
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet0'/>
+      <coalesce>
+        <rx>
+          <frames max='7'/>
+        </rx>
+      </coalesce>
+    </interface>
+  </devices>
+
+  <!-- IP configuration -->
+  
+  <devices>
+    <interface type='network'>
+      <source network='default'/>
+      <target dev='vnet0'/>
+      <ip address='192.168.122.5' prefix='24'/>
+      <ip address='192.168.122.5' prefix='24' peer='10.0.0.10'/>
+      <route family='ipv4' address='192.168.122.0' prefix='24' 
+          gateway='192.168.122.1'/>
+      <route family='ipv4' address='192.168.122.8' gateway='192.168.122.1'/>
+    </interface>
+    ...
+    <hostdev mode='capabilities' type='net'>
+      <source>
+        <interface>eth0</interface>
+      </source>
+      <ip address='192.168.122.6' prefix='24'/>
+      <route family='ipv4' address='192.168.122.0' prefix='24' gateway='192.168.122.1'/>
+      <route family='ipv4' address='192.168.122.8' gateway='192.168.122.1'/>
+    </hostdev>
+    ...
+  </devices>
+  <devices>
+    <interface type='ethernet'>
+      <source/>
+        <ip address='192.168.123.1' prefix='24'/>
+        <ip address='10.0.0.10' prefix='24' peer='192.168.122.5'/>
+        <route family='ipv4' address='192.168.42.0' prefix='24' gateway='192.168.123.4'/>
+      <source/>
+      ...
+    </interface>
+    ...
+  </devices>
+
+  <!-- vhost-user interface -->
+  
+  <devices>
+    <interface type='vhostuser'>
+      <mac address='52:54:00:3b:83:1a'/>
+      <source type='unix' path='/tmp/vhost1.sock' mode='server'/>
+      <model type='virtio'/>
+    </interface>
+    <interface type='vhostuser'>
+      <mac address='52:54:00:3b:83:1b'/>
+      <source type='unix' path='/tmp/vhost2.sock' mode='client'>
+        <reconnect enabled='yes' timeout='10'/>
+      </source>
+      <model type='virtio'/>
+      <driver queues='5'/>
+    </interface>
+  </devices>
+
+  <!-- Traffic filtering with NWFilter -->
+  
+  <devices>
+    <interface ...>
+      ...
+      <filterref filter='clean-traffic'/>
+    </interface>
+    <interface ...>
+      ...
+      <filterref filter='myfilter'>
+        <parameter name='IP' value='104.207.129.11'/>
+        <parameter name='IP6_ADDR' value='2001:19f0:300:2102::'/>
+        <parameter name='IP6_MASK' value='64'/>
+        ...
+      </filterref>
+    </interface>
+  </devices>
+
+  <!-- Input devices -->
+  
+  <devices>
+    <input type='mouse' bus='usb'/>
+    <input type='keyboard' bus='usb'/>
+    <input type='mouse' bus='virtio'/>
+    <input type='keyboard' bus='virtio'/>
+    <input type='tablet' bus='virtio'/>
+    <input type='passthrough' bus='virtio'>
+      <source evdev='/dev/input/event1/>'
+    </input>
+  </devices>
+
+  <!-- Hub devices -->
+
+  <devices>
+    <hub type='usb'/>
+  </devices>
+
+  <!-- Graphical framebuffers -->
+
+  <devices>
+    <graphics type='sdl' display=':0.0'/>
+    <graphics type='vnc' port='5904' sharePolicy='allow-exclusive'>
+      <listen type='address' address='1.2.3.4'/>
+    </graphics>
+    <graphics type='rdp' autoport='yes' multiUser='yes' />
+    <graphics type='desktop' fullscreen='yes'/>
+    <graphics type='spice'>
+      <listen type='network' network='rednet'/>
+    </graphics>
+  </devices>
+
+  <!-- Video devices -->
+
+  <devices>
+    <video>
+      <model type='vga' vram='16384' heads='1'>
+        <acceleration accel3d='yes' accel2d='yes'/>
+      </model>
+    </video>
+  </devices>
+
+  <!-- Consoles, serial, parallel & channel devices -->
+
+  <devices>
+    <parallel type='pty'>
+      <source path='/dev/pts/2'/>
+      <target port='0'/>
+    </parallel>
+    <serial type='pty'>
+      <source path='/dev/pts/3'/>
+      <target port='0'/>
+    </serial>
+    <serial type='file'>
+      <source path='/tmp/file' append='on'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <source path='/dev/pts/4'/>
+      <target port='0'/>
+    </console>
+    <channel type='unix'>
+      <source mode='bind' path='/tmp/guestfwd'/>
+      <target type='guestfwd' address='10.0.2.1' port='4600'/>
+    </channel>
+  </devices>
+  <devices>
+    <parallel type='pty'>
+      <source path='/dev/pts/2'/>
+      <target port='0'/>
+    </parallel>
+  </devices>
+  <devices>
+    <!-- Serial port -->
+    <serial type='pty'>
+      <source path='/dev/pts/3'/>
+      <target port='0'/>
+    </serial>
+  </devices>
+  <devices>
+    <!-- USB serial port -->
+    <serial type='pty'>
+      <target type='usb-serial' port='0'>
+        <model name='usb-serial'/>
+      </target>
+      <address type='usb' bus='0' port='1'/>
+    </serial>
+  </devices>
+  <devices>
+    <!-- Serial console -->
+    <console type='pty'>
+      <source path='/dev/pts/2'/>
+     <target type='serial' port='0'/>
+    </console>
+  </devices>
+  <devices>
+    <!-- KVM virtio console -->
+    <console type='pty'>
+      <source path='/dev/pts/5'/>
+      <target type='virtio' port='0'/>
+    </console>
+  </devices>
+  <devices>
+    <console type='pty'>
+      <target type='serial'/>
+    </console>
+    <console type='pty'>
+      <target type='virtio'/>
+    </console>
+  </devices>
+  <devices>
+    <serial type='pty'/>
+  </devices>
+  <devices>
+    <console type='pty'/>
+  </devices>
+  <devices>
+    <serial type='pty'/>
+    <console type='pty'/>
+  </devices>
+  <devices>
+    <channel type='unix'>
+      <source mode='bind' path='/tmp/guestfwd'/>
+      <target type='guestfwd' address='10.0.2.1' port='4600'/>
+    </channel>
+    <!-- KVM virtio channel -->
+    <channel type='pty'>
+      <target type='virtio' name='arbitrary.virtio.serial.port.name'/>
+    </channel>
+    <channel type='unix'>
+      <source mode='bind' path='/var/lib/libvirt/qemu/f16x86_64.agent'/>
+      <target type='virtio' name='org.qemu.guest_agent.0' state='connected'/>
+    </channel>
+    <channel type='spicevmc'>
+      <target type='virtio' name='com.redhat.spice.0'/>
+    </channel>
+  </devices>
+  <devices>
+    <console type='stdio'>
+      <target port='1'/>
+    </console>
+  </devices>
+  <devices>
+    <serial type="file">
+      <source path="/var/log/vm/vm-serial.log"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type='vc'>
+      <target port="1"/>
+    </serial>
+  </devices>
+    <devices>
+    <serial type='null'>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="pty">
+      <source path="/dev/pts/3"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="dev">
+      <source path="/dev/ttyS0"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="pipe">
+      <source path="/tmp/mypipe"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="tcp">
+      <source mode="connect" host="0.0.0.0" service="2445"/>
+      <protocol type="raw"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="tcp">
+      <source mode="bind" host="127.0.0.1" service="2445"/>
+      <protocol type="raw"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="tcp">
+      <source mode="connect" host="0.0.0.0" service="2445"/>
+      <protocol type="telnet"/>
+      <target port="1"/>
+    </serial>
+    ...
+    <serial type="tcp">
+      <source mode="bind" host="127.0.0.1" service="2445"/>
+      <protocol type="telnet"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="tcp">
+      <source mode='connect' host="127.0.0.1" service="5555" tls="yes"/>
+      <protocol type="raw"/>
+      <target port="0"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="udp">
+      <source mode="bind" host="0.0.0.0" service="2445"/>
+      <source mode="connect" host="0.0.0.0" service="2445"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="unix">
+      <source mode="bind" path="/tmp/foo"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="spiceport">
+      <source channel="org.qemu.console.serial.0"/>
+      <target port="1"/>
+    </serial>
+  </devices>
+  <devices>
+    <serial type="nmdm">
+      <source master="/dev/nmdm0A" slave="/dev/nmdm0B"/>
+    </serial>
+  </devices>
+  <devices>
+    <sound model='es1370'/>
+  </devices>
+  <devices>
+    <sound model='ich6'>
+      <codec type='micro'/>
+    </sound>
+  </devices>
+  <devices>
+    <watchdog model='i6300esb'/>
+  </devices>
+  <devices>
+    <watchdog model='i6300esb' action='poweroff'/>
+  </devices>
+  <devices>
+    <memballoon model='virtio'/>
+  </devices>
+  <devices>
+    <memballoon model='virtio'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' 
+          function='0x0'/>
+      <stats period='10'/>
+      <driver iommu='on' ats='on'/>
+    </memballoon>
+  </devices>
+  <devices>
+    <rng model='virtio'>
+      <rate period="2000" bytes="1234"/>
+      <backend model='random'>/dev/random</backend>
+      <!-- OR -->
+      <backend model='egd' type='udp'>
+        <source mode='bind' service='1234'/>
+        <source mode='connect' host='1.2.3.4' service='1234'/>
+      </backend>
+    </rng>
+  </devices>
+
+  <!-- TPM device -->
+
+  <devices>
+    <tpm model='tpm-tis'>
+      <backend type='passthrough'>
+        <device path='/dev/tpm0'/>
+      </backend>
+    </tpm>
+  </devices>
+  <devices>
+    <tpm model='tpm-tis'>
+      <backend type='emulator' version='2.0'>
+      </backend>
+    </tpm>
+  </devices>
+
+  <!-- NVRAM device -->
+
+  <devices>
+    <nvram>
+      <address type='spapr-vio' reg='0x3000'/>
+    </nvram>
+  </devices>
+  <devices>
+    <panic model='hyperv'/>
+    <panic model='isa'>
+      <address type='isa' iobase='0x505'/>
+    </panic>
+  </devices>
+
+  <!-- Shared memory devic -->
+
+  <devices>
+    <shmem name='my_shmem0'>
+      <model type='ivshmem-plain'/>
+      <size unit='M'>4</size>
+    </shmem>
+    <shmem name='shmem_server'>
+      <model type='ivshmem-doorbell'/>
+      <size unit='M'>2</size>
+      <server path='/tmp/socket-shmem'/>
+      <msi vectors='32' ioeventfd='on'/>
+    </shmem>
+  </devices>
+
+  <!-- Memory devices -->
+
+  <devices>
+    <memory model='dimm' access='private' discard='yes'>
+      <target>
+        <size unit='KiB'>524287</size>
+        <node>0</node>
+      </target>
+    </memory>
+    <memory model='dimm'>
+      <source>
+        <pagesize unit='KiB'>4096</pagesize>
+        <nodemask>1-3</nodemask>
+      </source>
+      <target>
+        <size unit='KiB'>524287</size>
+        <node>1</node>
+      </target>
+    </memory>
+
+    <!-- IOMMU devices -->
+
+   <devices>
+    <iommu model='intel'>
+      <driver intremap='on'/>
+    </iommu>
+  </devices>
+
+    <memory model='nvdimm'>
+      <source>
+        <path>/tmp/nvdimm</path>
+        <alignsize unit='KiB'>2048</alignsize>
+      </source>
+      <target>
+        <size unit='KiB'>524288</size>
+        <node>1</node>
+        <label>
+          <size unit='KiB'>128</size>
+        </label>
+        <readonly/>
+      </target>
+    </memory>
+    <memory model='nvdimm'>
+      <source>
+        <path>/dev/dax0.0</path>
+        <pmem/>
+      </source>
+      <target>
+        <size unit='KiB'>524288</size>
+        <node>1</node>
+        <label>
+          <size unit='KiB'>128</size>
+        </label>
+      </target>
+    </memory>
+  </devices>
+
+  <!-- IOMMU devices -->
+
+  <devices>
+    <iommu model='intel'>
+      <driver intremap='on'/>
+    </iommu>
+  </devices>
+
+  <!-- Vsock -->
+  
+  <devices>
+    <vsock model='virtio'>
+      <cid auto='no' address='3'/>
+    </vsock>
+  </devices>
+
+  <!-- Security label -->
+  
+  <seclabel type='dynamic' model='selinux'/>
+  <seclabel type='dynamic' model='selinux'>
+    <baselabel>system_u:system_r:my_svirt_t:s0</baselabel>
+  </seclabel>
+  <seclabel type='static' model='selinux' relabel='no'>
+    <label>system_u:system_r:svirt_t:s0:c392,c662</label>
+  </seclabel>
+  <seclabel type='static' model='selinux' relabel='yes'>
+    <label>system_u:system_r:svirt_t:s0:c392,c662</label>
+  </seclabel>
+  <seclabel type='none'/>
+
+  <!-- Key Wrap -->
+  
+  <keywrap>
+    <cipher name='aes' state='off'/>
+  </keywrap>
+
+  <!-- Launch Security -->
+  
+  <launchSecurity type='sev'>
+    <policy>0x0001</policy>
+    <cbitpos>47</cbitpos>
+    <reducedPhysBits>1</reducedPhysBits>
+    <dhCert>RBBBSDDD=FDDCCCDDDG</dhCert>
+    <session>AAACCCDD=FFFCCCDSDS</session>
+  </launchSecurity>
+</domain>
